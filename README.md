@@ -77,15 +77,8 @@
   </a>
 </p>
 
-<br>
 
-<p align="center">
-  <a href="https://github.com/ZenHKD">
-    <img src="https://github-profile-summary-cards.vercel.app/api/cards/profile-details?username=ZenHKD&theme=tokyonight" />
-  </a>
-</p>
 
-<br>
 
 <p align="center">
   <a href="https://github.com/ZenHKD">
