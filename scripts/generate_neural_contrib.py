@@ -149,13 +149,20 @@ def _level(count: int) -> int:
 
 
 def _node_positions() -> list[list[tuple[float, float]]]:
-    """Return [[(x, y), ...], ...] for each NN layer."""
+    """Return [[(x, y), ...], ...] for each NN layer.
+    The output layer aligns exactly with the 7 grid row centers."""
     positions = []
-    for layer in NN_LAYERS:
+    for li, layer in enumerate(NN_LAYERS):
         n = layer["count"]
         x = NN_MARGIN_LEFT + layer["x_frac"] * NN_WIDTH
-        spacing = GRID_H / (n + 1)
-        positions.append([(x, GRID_Y + spacing * (i + 1)) for i in range(n)])
+        if li == len(NN_LAYERS) - 1 and n == ROWS:
+            # Output layer: align with grid row centers
+            positions.append([
+                (x, GRID_Y + r * CELL_STRIDE + CELL_SIZE / 2) for r in range(ROWS)
+            ])
+        else:
+            spacing = GRID_H / (n + 1)
+            positions.append([(x, GRID_Y + spacing * (i + 1)) for i in range(n)])
     return positions
 
 
