@@ -2,13 +2,13 @@
 """
 Generate a neural network activation animation SVG from GitHub contribution data.
 
-The animation shows neural network layers activating with lightning-like signals
-that converge into the contribution grid, illuminating cells proportionally to
-contribution intensity.
+The animation shows neural network layers activating with signals
+that converge into the contribution grid, illuminating cell borders
+with a spreading glow effect.
 
 Animation loop (8s):
   0-2s  : NN nodes pulse, connections glow layer by layer
-  2-5s  : Lightning beams sweep across the grid (left → right)
+  2-5s  : Light sweeps across grid edges (left → right)
   5-7s  : Full contribution graph revealed
   7-8s  : Fade out, loop
 """
@@ -24,26 +24,26 @@ import urllib.request
 GITHUB_USER = os.environ.get("GITHUB_USER", "ZenHKD")
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 
-# ── Grid parameters ──────────────────────────────────────────────────────────
+# ── Grid parameters (BIGGER) ────────────────────────────────────────────────
 
-CELL_SIZE = 11
-CELL_GAP = 3
+CELL_SIZE = 16
+CELL_GAP = 4
 CELL_STRIDE = CELL_SIZE + CELL_GAP
-CELL_RADIUS = 2
+CELL_RADIUS = 3
 COLS = 52  # weeks
 ROWS = 7   # days
 
 # ── Layout ───────────────────────────────────────────────────────────────────
 
-NN_MARGIN_LEFT = 25
-NN_WIDTH = 140
-GAP_NN_GRID = 35
+NN_MARGIN_LEFT = 35
+NN_WIDTH = 180
+GAP_NN_GRID = 50
 GRID_X = NN_MARGIN_LEFT + NN_WIDTH + GAP_NN_GRID
-GRID_Y = 40
+GRID_Y = 50
 GRID_W = COLS * CELL_STRIDE
 GRID_H = ROWS * CELL_STRIDE
-SVG_W = GRID_X + GRID_W + 20
-SVG_H = GRID_Y + GRID_H + 45
+SVG_W = GRID_X + GRID_W + 30
+SVG_H = GRID_Y + GRID_H + 55
 
 # ── Neural network layers ───────────────────────────────────────────────────
 
@@ -52,7 +52,7 @@ NN_LAYERS = [
     {"count": 5, "x_frac": 0.45},   # Hidden
     {"count": 7, "x_frac": 1.0},    # Output (maps to 7 grid rows)
 ]
-NODE_R = 5
+NODE_R = 7
 
 # ── Colors (tokyonight-inspired) ────────────────────────────────────────────
 
@@ -62,6 +62,7 @@ NODE_DIM = "#2a2e42"
 LIGHTNING = "#7dcfff"
 NODE_GLOW = "#bb9af7"
 SUBTITLE = "#565f89"
+EDGE_COLOR = "#7dcfff"
 
 CONTRIB_COLORS = {
     0: "#1e2030",
@@ -110,7 +111,7 @@ def fetch_contributions(user: str, token: str) -> dict:
         "https://api.github.com/graphql", data=body, headers=headers, method="POST"
     )
     try:
-        with urllib.request.urlopen(req) as r:
+        with urllib.request.urlopen(req, timeout=10) as r:
             data = json.loads(r.read().decode())
             return data["data"]["user"]["contributionsCollection"]["contributionCalendar"]
     except Exception as e:
@@ -148,7 +149,7 @@ def _level(count: int) -> int:
 
 
 def _node_positions() -> list[list[tuple[float, float]]]:
-    """Return [[( x, y ), ...], ...] for each NN layer."""
+    """Return [[(x, y), ...], ...] for each NN layer."""
     positions = []
     for layer in NN_LAYERS:
         n = layer["count"]
@@ -161,32 +162,40 @@ def _node_positions() -> list[list[tuple[float, float]]]:
 def _build_defs() -> str:
     return f"""<defs>
   <filter id="gN" x="-50%" y="-50%" width="200%" height="200%">
-    <feGaussianBlur stdDeviation="3" result="b"/>
+    <feGaussianBlur stdDeviation="4" result="b"/>
     <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
   </filter>
   <filter id="gL" x="-40%" y="-40%" width="180%" height="180%">
-    <feGaussianBlur stdDeviation="2.5" result="b"/>
+    <feGaussianBlur stdDeviation="3" result="b"/>
     <feColorMatrix in="b" type="matrix"
       values="0 0 0 0 0.49
               0 0 0 0 0.81
               0 0 0 0 1
-              0 0 0 1.5 0" result="cb"/>
+              0 0 0 1.8 0" result="cb"/>
     <feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge>
   </filter>
-  <filter id="gC" x="-30%" y="-30%" width="160%" height="160%">
-    <feGaussianBlur stdDeviation="1.8" result="b"/>
+  <filter id="gC" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur stdDeviation="2.5" result="b"/>
     <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="gE" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="2" result="b"/>
+    <feColorMatrix in="b" type="matrix"
+      values="0 0 0 0 0.49
+              0 0 0 0 0.81
+              0 0 0 0 1
+              0 0 0 2 0" result="cb"/>
+    <feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge>
   </filter>
 </defs>"""
 
 
 def _build_styles(grid: list[list[int]]) -> str:
     """Build <style> block with all CSS keyframes and animation rules."""
-    # ── Keyframes ────────────────────────────────────────────────────────
     s = f"""<style>
 @keyframes np{{
   0%,100%{{r:{NODE_R};opacity:.25}}
-  50%{{r:{NODE_R+2};opacity:1}}
+  50%{{r:{NODE_R+3};opacity:1}}
 }}
 @keyframes ng{{
   0%,100%{{opacity:0}}
@@ -195,14 +204,14 @@ def _build_styles(grid: list[list[int]]) -> str:
 }}
 @keyframes ca{{
   0%,15%{{stroke:{NODE_DIM};opacity:.12}}
-  35%,65%{{stroke:{LIGHTNING};opacity:.7}}
+  35%,65%{{stroke:{LIGHTNING};opacity:.8}}
   85%,100%{{stroke:{NODE_DIM};opacity:.12}}
 }}
 @keyframes bf{{
-  0%{{stroke-dashoffset:200;opacity:0}}
-  12%{{opacity:.75}}
-  88%{{opacity:.75}}
-  100%{{stroke-dashoffset:-200;opacity:0}}
+  0%{{opacity:0}}
+  15%{{opacity:.7}}
+  85%{{opacity:.7}}
+  100%{{opacity:0}}
 }}
 @keyframes gc{{
   0%,18%{{opacity:.08}}
@@ -214,39 +223,39 @@ def _build_styles(grid: list[list[int]]) -> str:
   0%,100%{{opacity:.18}}
   50%{{opacity:.28}}
 }}
-@keyframes lf{{
-  0%{{stroke-dashoffset:80;opacity:0}}
-  15%{{opacity:.5}}
-  85%{{opacity:.5}}
-  100%{{stroke-dashoffset:-80;opacity:0}}
+@keyframes eg{{
+  0%,15%{{stroke-opacity:0}}
+  30%{{stroke-opacity:.9;stroke:{EDGE_COLOR}}}
+  50%{{stroke-opacity:.5;stroke:{EDGE_COLOR}}}
+  70%,100%{{stroke-opacity:0}}
 }}
 """
 
-    # ── NN layer delays ──────────────────────────────────────────────────
+    # NN layer delays
     for li, layer in enumerate(NN_LAYERS):
         d = li * 0.6
         s += f".nl{li}{{animation:np {CYCLE}s {d:.1f}s ease-in-out infinite}}\n"
         s += f".gl{li}{{animation:ng {CYCLE}s {d:.1f}s ease-in-out infinite}}\n"
 
-    # ── Connection delays ────────────────────────────────────────────────
+    # Connection delays
     for li in range(len(NN_LAYERS) - 1):
         d = li * 0.6 + 0.3
         s += f".cl{li}{{animation:ca {CYCLE}s {d:.1f}s ease-in-out infinite}}\n"
 
-    # ── Beam delays (per row) ────────────────────────────────────────────
+    # Beam delays (per row) — solid lines now
     for r in range(ROWS):
         d = 1.5 + r * 0.1
         s += f".br{r}{{animation:bf {CYCLE}s {d:.1f}s ease-in-out infinite}}\n"
 
-    # ── Grid column delays ───────────────────────────────────────────────
+    # Grid column delays
     for c in range(COLS):
         d = 2.0 + c * 0.055
         s += f".gc{c}{{animation:gc {CYCLE}s {d:.2f}s ease-in-out infinite}}\n"
 
-    # ── Lightning row delays ─────────────────────────────────────────────
-    for r in range(ROWS):
-        d = 1.8 + r * 0.12
-        s += f".lr{r}{{animation:lf {CYCLE}s {d:.1f}s ease-in-out infinite}}\n"
+    # Edge glow per column (light spreading along cell borders)
+    for c in range(COLS):
+        d = 1.8 + c * 0.055
+        s += f".eg{c}{{animation:eg {CYCLE}s {d:.2f}s ease-in-out infinite}}\n"
 
     s += "</style>"
     return s
@@ -263,7 +272,7 @@ def _build_nn_nodes(positions: list[list[tuple]]) -> str:
         for x, y in layer:
             # glow halo
             parts.append(
-                f'<circle cx="{x}" cy="{y}" r="{NODE_R+3}" '
+                f'<circle cx="{x}" cy="{y}" r="{NODE_R+4}" '
                 f'fill="{LIGHTNING}" opacity="0" class="gl{li}" filter="url(#gN)"/>'
             )
             # main node
@@ -276,8 +285,8 @@ def _build_nn_nodes(positions: list[list[tuple]]) -> str:
     for li, layer in enumerate(positions):
         lx = NN_MARGIN_LEFT + NN_LAYERS[li]["x_frac"] * NN_WIDTH
         parts.append(
-            f'<text x="{lx}" y="{GRID_Y + GRID_H + 18}" '
-            f'font-family="\'Fira Code\',monospace" font-size="8" '
+            f'<text x="{lx}" y="{GRID_Y + GRID_H + 22}" '
+            f'font-family="\'Fira Code\',monospace" font-size="9" '
             f'fill="{SUBTITLE}" text-anchor="middle" opacity=".45">{labels[li]}</text>'
         )
     return "\n".join(parts)
@@ -290,20 +299,19 @@ def _build_nn_connections(positions: list[list[tuple]]) -> str:
         nc, nn = len(cur), len(nxt)
         for i, (x1, y1) in enumerate(cur):
             for j, (x2, y2) in enumerate(nxt):
-                # connect if proportionally close
                 if abs(i * nn / nc - j) > 1.6:
                     continue
                 mx = (x1 + x2) / 2
                 parts.append(
                     f'<path d="M{x1:.0f},{y1:.0f} Q{mx:.0f},{(y1+y2)/2:.0f} {x2:.0f},{y2:.0f}" '
-                    f'fill="none" stroke="{NODE_DIM}" stroke-width=".8" '
+                    f'fill="none" stroke="{NODE_DIM}" stroke-width="1" '
                     f'opacity=".12" class="cl{li}" filter="url(#gL)"/>'
                 )
     return "\n".join(parts)
 
 
 def _build_beams(positions: list[list[tuple]]) -> str:
-    """Activation beams from output layer → grid rows."""
+    """Solid activation beams from output layer → grid rows (no dashes)."""
     parts = ["<!-- Activation Beams -->"]
     output = positions[-1]
     for r in range(min(ROWS, len(output))):
@@ -311,10 +319,9 @@ def _build_beams(positions: list[list[tuple]]) -> str:
         gy = GRID_Y + r * CELL_STRIDE + CELL_SIZE / 2
         parts.append(
             f'<line x1="{ox + NODE_R + 2:.0f}" y1="{oy:.0f}" '
-            f'x2="{GRID_X + GRID_W:.0f}" y2="{gy:.0f}" '
-            f'stroke="{LIGHTNING}" stroke-width="1.2" fill="none" '
-            f'stroke-dasharray="8 14" stroke-dashoffset="200" opacity="0" '
-            f'class="br{r}" filter="url(#gL)"/>'
+            f'x2="{GRID_X:.0f}" y2="{gy:.0f}" '
+            f'stroke="{LIGHTNING}" stroke-width="1.5" fill="none" '
+            f'opacity="0" class="br{r}" filter="url(#gL)"/>'
         )
     return "\n".join(parts)
 
@@ -341,22 +348,31 @@ def _build_grid(grid: list[list[int]]) -> str:
     return "\n".join(parts)
 
 
-def _build_lightning_rows() -> str:
-    """Horizontal lightning traces across each grid row."""
-    parts = ["<!-- Lightning Traces -->"]
-    rng = random.Random(42)
-    for r in range(ROWS):
-        y = GRID_Y + r * CELL_STRIDE + CELL_SIZE / 2
-        pts = [f"M{GRID_X},{y:.0f}"]
-        for c in range(COLS):
-            cx = GRID_X + c * CELL_STRIDE + CELL_SIZE / 2
-            jitter = rng.uniform(-2.5, 2.5)
-            pts.append(f"L{cx:.0f},{y + jitter:.1f}")
-        parts.append(
-            f'<path d="{" ".join(pts)}" stroke="{LIGHTNING}" stroke-width=".9" '
-            f'fill="none" stroke-dasharray="6 12" stroke-dashoffset="80" '
-            f'opacity="0" class="lr{r}" filter="url(#gL)"/>'
-        )
+def _build_edge_glow(grid: list[list[int]]) -> str:
+    """Draw animated glowing borders around each cell that light up column by column.
+    The light 'spreads along the edges' of the squares as activation flows through."""
+    parts = ["<!-- Edge Glow (light spreading along cell borders) -->"]
+    for c in range(min(len(grid), COLS)):
+        for r in range(min(len(grid[c]), ROWS)):
+            lv = grid[c][r]
+            x = GRID_X + c * CELL_STRIDE
+            y = GRID_Y + r * CELL_STRIDE
+            # brighter edges for contribution cells
+            if lv > 0:
+                sw = 1.0 + lv * 0.3
+                parts.append(
+                    f'<rect x="{x}" y="{y}" width="{CELL_SIZE}" height="{CELL_SIZE}" '
+                    f'rx="{CELL_RADIUS}" fill="none" '
+                    f'stroke="{EDGE_COLOR}" stroke-width="{sw:.1f}" stroke-opacity="0" '
+                    f'class="eg{c}" filter="url(#gE)"/>'
+                )
+            else:
+                parts.append(
+                    f'<rect x="{x}" y="{y}" width="{CELL_SIZE}" height="{CELL_SIZE}" '
+                    f'rx="{CELL_RADIUS}" fill="none" '
+                    f'stroke="{EDGE_COLOR}" stroke-width="0.6" stroke-opacity="0" '
+                    f'class="eg{c}"/>'
+                )
     return "\n".join(parts)
 
 
@@ -381,16 +397,16 @@ def generate_svg(calendar: dict) -> str:
         _build_styles(grid),
         _build_defs(),
         # background
-        f'<rect width="{SVG_W}" height="{SVG_H}" fill="{BG}" rx="10"/>',
+        f'<rect width="{SVG_W}" height="{SVG_H}" fill="{BG}" rx="12"/>',
         # subtitle
-        f'<text x="{SVG_W/2:.0f}" y="26" font-family="\'Fira Code\',monospace" '
-        f'font-size="10" fill="{SUBTITLE}" text-anchor="middle" opacity=".55">'
+        f'<text x="{SVG_W/2:.0f}" y="32" font-family="\'Fira Code\',monospace" '
+        f'font-size="12" fill="{SUBTITLE}" text-anchor="middle" opacity=".55">'
         f'neural activation · contribution graph</text>',
         _build_nn_connections(pos),
         _build_nn_nodes(pos),
         _build_beams(pos),
         _build_grid(grid),
-        _build_lightning_rows(),
+        _build_edge_glow(grid),
         "</svg>",
     ])
 
