@@ -293,18 +293,16 @@ def _build_nn_nodes(positions: list[list[tuple]]) -> str:
 
 
 def _build_nn_connections(positions: list[list[tuple]]) -> str:
-    parts = ["<!-- NN Connections -->"]
+    """Fully connected layers — every node connects to every node in the next layer."""
+    parts = ["<!-- NN Connections (fully connected) -->"]
     for li in range(len(positions) - 1):
         cur, nxt = positions[li], positions[li + 1]
-        nc, nn = len(cur), len(nxt)
         for i, (x1, y1) in enumerate(cur):
             for j, (x2, y2) in enumerate(nxt):
-                if abs(i * nn / nc - j) > 1.6:
-                    continue
                 mx = (x1 + x2) / 2
                 parts.append(
                     f'<path d="M{x1:.0f},{y1:.0f} Q{mx:.0f},{(y1+y2)/2:.0f} {x2:.0f},{y2:.0f}" '
-                    f'fill="none" stroke="{NODE_DIM}" stroke-width="1" '
+                    f'fill="none" stroke="{NODE_DIM}" stroke-width=".7" '
                     f'opacity=".12" class="cl{li}" filter="url(#gL)"/>'
                 )
     return "\n".join(parts)
