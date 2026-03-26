@@ -48,7 +48,7 @@
 | Project | Description |
 |---------|-------------|
 | 🔭 [**Thesis — SpatialVLM**](https://github.com/ZenHKD/Thesis) | Depth-aware Vision-Language Model for spatial reasoning in warehouse environments |
-| 🧬 [**bio-med-rag**](https://github.com/ZenHKD/bio-med-rag) | RAG system for biomedical information retrieval (NLP course @ HCMUST) |
+| 🧬 [**bio-med-rag**](https://github.com/ZenHKD/bio-med-rag) | RAG system for biomedical information retrieval (NLP course @ USTH) |
 | 🧱 [**modern-transformer**](https://github.com/ZenHKD/modern-transformer) | Modern transformer architecture implementations |
 | 🌐 [**transformer-from-scratch-translation-ja-en**](https://github.com/ZenHKD/transformer-from-scratch-translation-ja-en) | Transformer built from scratch for Japanese → English translation |
 | 🎨 [**model-scratch-manga-segmentation**](https://github.com/ZenHKD/model-scratch-manga-segmentation) | Custom segmentation model for manga panel analysis |
