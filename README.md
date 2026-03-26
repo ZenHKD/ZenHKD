@@ -18,7 +18,7 @@
 
 ## 🧠 About Me
 
-- 🎓 Student at **University of Science and Technology (USTH)**
+- 🎓 Student at **University of Science and Technology of Hanoi (USTH)**
 - 🔬 Passionate about **Deep Learning**, **Computer Vision**, **NLP**, and **MLOps**
 - 🏗️ Love building things from scratch — transformers, LLMs, segmentation models, RAG systems
 - 🧬 Exploring intersections of AI with **biomedicine** and **bioinformatics**
