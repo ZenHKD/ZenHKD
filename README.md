@@ -20,7 +20,7 @@
 
 - 🎓 Student at **University of Science and Technology of Hanoi (USTH)**
 - 🔬 Passionate about **Deep Learning**, **Computer Vision**, **NLP**, and **MLOps**
-- 🏗️ Love building things from scratch — transformers, LLMs, segmentation models, RAG systems
+- 🏗️ Love building things from scratch — DL, Transformers, segmentation models
 - 🧬 Exploring intersections of AI with **biomedicine** and **bioinformatics**
 - 🎯 Currently working on **SpatialVLM** — a depth-aware VLM for spatial reasoning
 
@@ -50,7 +50,7 @@
 | 🧬 [**bio-med-rag**](https://github.com/ZenHKD/bio-med-rag) | RAG system for biomedical information retrieval (NLP course @ USTH) |
 | 🧱 [**modern-transformer**](https://github.com/ZenHKD/modern-transformer) | Modern transformer architecture implementations |
 | 🌐 [**transformer-from-scratch-translation-ja-en**](https://github.com/ZenHKD/transformer-from-scratch-translation-ja-en) | Transformer built from scratch for Japanese → English translation |
-| 🎨 [**model-scratch-manga-segmentation**](https://github.com/ZenHKD/model-scratch-manga-segmentation) | Custom segmentation model for manga panel analysis |
+| 🎨 [**model-scratch-manga-segmentation**](https://github.com/ZenHKD/model-scratch-manga-segmentation) | Mimic YOLO segmentation model for manga panel analysis |
 | 🧬 [**crispr-offtarget**](https://github.com/ZenHKD/crispr-offtarget) | ML for CRISPR off-target prediction in bioinformatics |
 | 📄 [**ocr-vi-invoice**](https://github.com/ZenHKD/ocr-vi-invoice) | OCR pipeline for Vietnamese invoice extraction |
 | 💬 [**characters-and-dialouges-association-in-comics**](https://github.com/ZenHKD/characters-and-dialouges-association-in-comics) | Associating characters with dialogue in comic panels |
