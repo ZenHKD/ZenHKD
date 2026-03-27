@@ -61,9 +61,6 @@
 
 <p align="center">
   <a href="https://github.com/ZenHKD">
-    <img src="https://github-readme-stats.vercel.app/api?username=ZenHKD&show_icons=true&theme=tokyonight&hide_border=true&count_private=true&include_all_commits=true" height="170" />
-  </a>
-  <a href="https://github.com/ZenHKD">
     <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=ZenHKD&layout=compact&theme=tokyonight&hide_border=true&langs_count=8" height="170" />
   </a>
 </p>
