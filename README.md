@@ -22,7 +22,7 @@
 - 🔬 Passionate about **Deep Learning**, **Computer Vision**, **NLP**, and **MLOps**
 - 🏗️ Love building things from scratch — DL, Transformers, segmentation models
 - 🧬 Exploring intersections of AI with **biomedicine** and **bioinformatics**
-- 🎯 Currently working on **SpatialVLM** — a depth-aware VLM for spatial reasoning
+- ✅ Completed **SpatialVLM** — a depth-aware VLM for spatial reasoning
 
 ---
 
