@@ -61,7 +61,7 @@
 
 <p align="center">
   <a href="https://github.com/ZenHKD">
-    <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=ZenHKD&layout=compact&theme=tokyonight&hide_border=true&langs_count=8" height="170" />
+    <img src="https://github-stats-extended.vercel.app/api/top-langs/?username=ZenHKD&layout=compact&theme=tokyonight&hide_border=true&langs_count=8" height="170" />
   </a>
 </p>
 
